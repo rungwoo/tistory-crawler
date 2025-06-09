@@ -18,7 +18,7 @@ with open('service_account.json', 'w') as f:
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 credentials = ServiceAccountCredentials.from_json_keyfile_name('service_account.json', scope)
 gc = gspread.authorize(credentials)
-sheet = gc.open_by_key(google_sheet_id).sheet1
+sheet = gc.open_by_key(google_sheet_id).sheet1  # 시트 이름이 'sheet1'이면 그대로 사용 가능
 
 # 4. 티스토리 블로그 설정
 BASE_URL = 'https://bomiiii.tistory.com'
@@ -31,17 +31,19 @@ def crawl_posts():
         url = f'{BASE_URL}/?page={page}'
         res = requests.get(url)
         soup = BeautifulSoup(res.text, 'html.parser')
-        posts = soup.select('a.tit_post')
+        posts = soup.select('a.link_title')  # 북클럽 스킨에 맞는 클래스
 
         if not posts:
-            break  # 더 이상 글이 없으면 종료
+            print(f"{page}페이지에서 포스트를 찾을 수 없습니다.")
+            break
 
         for post in posts:
-            title = post.text.strip()
+            title_tag = post.select_one('strong.title_post')
+            title = title_tag.text.strip() if title_tag else post.text.strip()
             href = post['href']
             full_url = href if href.startswith('http') else BASE_URL + href
 
-            # 카테고리 추출을 위해 글 상세페이지 요청
+            # 카테고리 추출 (상세페이지 접근)
             post_res = requests.get(full_url)
             post_soup = BeautifulSoup(post_res.text, 'html.parser')
             category_tag = post_soup.find('meta', attrs={'property': 'article:section'})
