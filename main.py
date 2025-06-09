@@ -31,7 +31,7 @@ def crawl_posts():
         url = f'{BASE_URL}/?page={page}'
         res = requests.get(url)
         soup = BeautifulSoup(res.text, 'html.parser')
-        posts = soup.select('a.link_title')
+        posts = soup.select('a.link_post')
 
         if not posts:
             break  # 더 이상 글이 없으면 종료
