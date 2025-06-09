@@ -6,6 +6,14 @@ import json
 import os
 from oauth2client.service_account import ServiceAccountCredentials
 
+try:
+    test = requests.get('https://bomiiii.tistory.com', timeout=10)
+    print("티스토리 접속 성공:", test.status_code)
+except Exception as e:
+    print("티스토리 접속 실패:", str(e))
+
+
+
 # 1. 환경변수에서 구글 인증 정보 불러오기
 google_json = os.environ['GOOGLE_SERVICE_ACCOUNT_JSON']
 google_sheet_id = os.environ['GOOGLE_SHEET_ID']
